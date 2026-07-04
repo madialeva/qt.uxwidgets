@@ -1,0 +1,60 @@
+# ---- Build de CMake ----
+/build/
+build/
+cmake-build-*/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+install_manifest.txt
+compile_commands.json
+CMakeUserPresets.json
+
+# ---- Ninja / Make ----
+.ninja_deps
+.ninja_log
+*.ninja
+Makefile
+
+# ---- Autogenerados de Qt (moc/uic/rcc) ----
+*_autogen/
+moc_*.cpp
+moc_*.h
+qrc_*.cpp
+ui_*.h
+*.qm
+
+# ---- Artefactos de compilación ----
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dll
+*.dylib
+*.exe
+*.exp
+*.ilk
+*.pdb
+
+# ---- Qt Creator / qmake ----
+*.pro.user*
+*.qmake.stash
+.qtc_clangd/
+
+# ---- IDEs / editores ----
+.vscode/
+.vs/
+.idea/
+*.swp
+*~
+
+# ---- AI's folders and files ----
+.claude/
+.github/
+openspec/
+AGENTS.md
+
+# ---- Sistema ----
+.DS_Store
+Thumbs.db

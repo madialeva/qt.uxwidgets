@@ -1,6 +1,7 @@
 # ---- Build de CMake ----
 /build/
 build/
+build-linux*/
 cmake-build-*/
 CMakeCache.txt
 CMakeFiles/
@@ -53,7 +54,6 @@ ui_*.h
 .claude/
 .github/
 openspec/
-AGENTS.md
 
 # ---- Sistema ----
 .DS_Store

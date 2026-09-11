@@ -2,213 +2,236 @@
 
 # UxWidgets
 
-**Controles Qt Widgets reutilizables para formularios de entrada de datos.**
+**Reusable Qt Widgets controls for data-entry forms.**
 
-Un control de entrada compuesto y configurable —etiqueta + campo tipado + icono—
-en una sola línea de código, con validación, resaltado del campo activo y
-propiedades listas para el diseñador.
+A configurable composite input control -- label + typed field + icon -- in a
+single line of code, with validation, active-field highlighting, and properties
+ready for Designer.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 ![C++17](https://img.shields.io/badge/C%2B%2B-17-00599C.svg?logo=cplusplus&logoColor=white)
 ![Qt 6](https://img.shields.io/badge/Qt-6-41CD52.svg?logo=qt&logoColor=white)
 ![CMake](https://img.shields.io/badge/CMake-3.21%2B-064F8C.svg?logo=cmake&logoColor=white)
-![Platform](https://img.shields.io/badge/plataforma-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)
+![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)
 
 </div>
 
 <div align="center">
 
-| Tema claro | Tema oscuro |
+| Light theme | Dark theme |
 |:---:|:---:|
-| ![Demo de UxWidgets en tema claro](assets/demo-claro.png) | ![Demo de UxWidgets en tema oscuro](assets/demo-oscuro.png) |
+| ![UxWidgets demo in light theme](assets/demo-claro.png) | ![UxWidgets demo in dark theme](assets/demo-oscuro.png) |
 
-<sub>El campo con el foco se resalta en azul (claro u oscuro según el tema); el campo requerido y vacío se avisa en bisque.</sub>
+<sub>The focused field is highlighted in blue (light or dark depending on the theme); required empty fields are highlighted in bisque.</sub>
 
 </div>
 
 ---
 
-`UxWidgets` empaqueta el patrón "etiqueta + campo + icono" que se repite cientos de
-veces en los formularios de una aplicación de escritorio. En vez de crear, alinear y
-validar tres widgets por cada dato, colocas **un** control que ya sabe comportarse
-como texto, número o fecha.
+`UxWidgets` packages the "label + field + icon" pattern repeated throughout desktop
+application forms. Instead of creating, aligning, and validating three widgets for
+each value, place **one** control that already knows how to behave as text, a number,
+or a date.
 
-## ✨ Características
+## ✨ Features
 
-- 🧩 **Control compuesto** — etiqueta, campo e icono como una sola unidad; la
-  etiqueta se coloca a la izquierda o arriba.
-- 🔤 **Tres sabores tipados** — texto (con longitud máxima y mayúsculas), número
-  (dígitos enteros/decimales y separador de miles) y fecha (`dd/MM/yyyy`).
-- 📅 **Fecha tolerante a vacío** — sobre `QLineEdit`, admite el campo vacío cuando no
-  es obligatorio (algo que `QDateEdit` no permite) y ofrece un calendario emergente.
-- 🔎 **Botón selector integrado** — un icono dentro del campo que abre tu diálogo de
-  elección; tú decides qué mostrar y qué devolver.
-- 🎯 **Resaltado del campo activo** — el campo con el foco tiñe su fondo, con color
-  **adaptado al tema** (claro/oscuro) y actualizado si el tema cambia en caliente.
-- ⚠️ **Aviso de campo requerido** — resalte visual cuando un campo obligatorio
-  está vacío.
-- 🎛️ **Todo configurable por `Q_PROPERTY`** — preparado para un futuro plugin de
-  Qt Designer sin rediseñar los controles.
-- 📦 **Sin dependencias** más allá de Qt 6 y C++17.
+- 🧩 **Composite control** -- label, field, and icon as a single unit; the label can
+  be placed to the left or above.
+- 🔤 **Three typed variants** -- text (with maximum length and uppercase), number
+  (integer/decimal digits and thousands separator), and date (`dd/MM/yyyy`).
+- 📅 **Empty-tolerant date** -- built on `QLineEdit`, it accepts an empty field when
+  not required (something `QDateEdit` does not naturally allow) and provides a popup
+  calendar.
+- 🔎 **Built-in selection button** -- an icon inside the field opens your selection
+  dialog; you decide what to show and what to return.
+- 🎯 **Active-field highlighting** -- the focused field tints its background with a
+  **theme-aware** color (light/dark), updated when the theme changes at runtime.
+- ⚠️ **Required-field warning** -- visual feedback when a mandatory field is empty.
+- 🎛️ **Fully configurable with `Q_PROPERTY`** -- ready for a future Qt Designer
+  plugin without redesigning the controls.
+- 📦 **No dependencies** beyond Qt 6 and C++17.
 
-## 🧱 Anatomía de un control
+## 🧱 Control Anatomy
 
 ```
    ┌──────────────────────────────────────────────┐
-   │  UxInput  (una sola cosa que colocas)        │
+  │  UxInput  (a single control to place)        │
    │  ┌─────────┐ ┌──────────────────┐ ┌────────┐ │
-   │  │ Etiqueta│ │  campo de texto  │ │   …    │ │
+  │  │  Label  │ │    text field    │ │   …    │ │
    │  └─────────┘ └──────────────────┘ └────────┘ │
-   │    QLabel        UxCampo            selector │
+  │    QLabel        UxField            selector │
    └──────────────────────────────────────────────┘
 ```
 
-Arquitectura en dos capas: los controles heredan de widgets estándar de Qt.
+Two-layer architecture: controls inherit from standard Qt widgets.
 
 ```
               QLineEdit                              QWidget
                   │                                     │
             ┌─────┴─────┐                        ┌──────┴──────┐
-            │  UxCampo  │  (común)               │   UxInput   │  (compuesto)
+            │  UxField  │  (common)              │   UxInput   │  (composite)
             └─────┬─────┘                        │ QLabel +    │
-      ┌───────────┼───────────┐                  │ UxCampo* +  │
- UxCampoTexto UxCampoNumero UxCampoFecha         │ layout      │
+       ┌───────────┼───────────┐                  │ UxField* +  │
+     UxTextField UxNumberField UxDateField           │ layout      │
                                                  └──────┬──────┘
                                            ┌────────────┼────────────┐
-                                      UxInputTexto  UxInputNumero  UxInputFecha
+                                      UxTextInput  UxNumberInput  UxDateInput
 ```
 
-- **Capa de campo** (`UxCampo : QLineEdit`): comportamiento común (botón selector,
-  requerido, resaltado de foco) + la validación propia de cada tipo.
-- **Capa compuesta** (`UxInput : QWidget`): etiqueta + campo + layout y reenvío de
-  propiedades. Las conveniencias `UxInput{Texto,Numero,Fecha}` crean el campo del
-  tipo adecuado.
+- **Field layer** (`UxField : QLineEdit`): shared behavior (selection button,
+  required state, focus highlighting) plus validation for each type.
+- **Composite layer** (`UxInput : QWidget`): label + field + layout and property
+  forwarding. The `Ux{Text,Number,Date}Input` convenience classes create the
+  appropriate field type.
 
-## 📋 Requisitos
+## 📋 Requirements
 
 - **Qt 6** (Core, Gui, Widgets)
 - **C++17**
 - **CMake ≥ 3.21**
+- **Ninja** (recomendado como generador)
 
-> Probado con Qt 6.8.3 y MinGW (GCC) en Windows. Al ser Qt Widgets portable, debería
-> compilar en cualquier plataforma con Qt 6. El despliegue autocontenido de la demo
-> (`windeployqt`) es específico de Windows.
+Tested on Windows with Qt 6 and MinGW, and on Linux with Qt 6, GCC, CMake, and
+Ninja. Self-contained demo deployment with `windeployqt` is Windows-specific.
 
-## 🚀 Uso rápido
+On Fedora, RHEL, CentOS Stream, and Oracle Linux distributions, install the
+development environment with:
 
-Añade la librería a tu proyecto CMake y enlaza el target:
+```bash
+sudo dnf install qt6-qtbase-devel qt6-qttools cmake ninja-build gcc-c++
+```
+
+## 🚀 Quick Start
+
+Add the library to your CMake project and link its target:
 
 ```cmake
-add_subdirectory(ruta/a/UxWidgets)
-target_link_libraries(MiApp PRIVATE UxWidgets::UxWidgets)
+add_subdirectory(path/to/UxWidgets)
+target_link_libraries(MyApp PRIVATE UxWidgets::UxWidgets)
 ```
 
 ```cpp
-#include <UxWidgets/UxInputTexto.h>
-#include <UxWidgets/UxInputNumero.h>
-#include <UxWidgets/UxInputFecha.h>
+#include <UxWidgets/UxTextInput.h>
+#include <UxWidgets/UxNumberInput.h>
+#include <UxWidgets/UxDateInput.h>
 ```
 
-Al consumirla como dependencia, desactiva la demo:
+When using it as a dependency, disable the demo:
 
 ```cmake
 set(UXWIDGETS_BUILD_DEMO OFF)
-add_subdirectory(ruta/a/UxWidgets)
+add_subdirectory(path/to/UxWidgets)
 ```
 
-## 💡 Ejemplos
+## 💡 Examples
 
 ```cpp
-// Texto en mayúsculas, longitud máxima y campo obligatorio
-auto *nombre = new UxInputTexto("Nombre");
-nombre->campoTexto()->setMayusculas(true);
-nombre->setMaxLength(30);
-nombre->setRequerido(true);
+// Uppercase text, maximum length, and a required field
+auto *name = new UxTextInput("Name");
+name->textField()->setUppercase(true);
+name->setMaxLength(30);
+name->setRequired(true);
 
-// Importe: 6 enteros, 2 decimales, separador de miles
-auto *importe = new UxInputNumero("Importe");
-importe->campoNumero()->setDigitosEnteros(6);
-importe->campoNumero()->setDigitosDecimales(2);
-importe->campoNumero()->setSeparadorMiles(true);
+// Amount: 6 integer digits, 2 decimal digits, thousands separator
+auto *amount = new UxNumberInput("Amount");
+amount->numberField()->setIntegerDigits(6);
+amount->numberField()->setDecimalDigits(2);
+amount->numberField()->setThousandsSeparator(true);
 
-// Fecha con etiqueta arriba (admite vacío)
-auto *fecha = new UxInputFecha("Fecha");
-fecha->setLabelPosition(UxInput::Arriba);
+// Date with the label above (allows empty values)
+auto *date = new UxDateInput("Date");
+date->setLabelPosition(UxInput::Above);
 ```
 
-## 🧭 Catálogo de controles
+## 🧭 Control Catalog
 
-| Control | Hereda | Para qué |
+| Control | Inherits | Purpose |
 |---|---|---|
-| `UxCampoTexto` | `UxCampo` | Texto libre. `maxLength` y `mayusculas`. |
-| `UxCampoNumero` | `UxCampo` | Solo numérico. `digitosEnteros`, `digitosDecimales`, `separadorMiles`; alineado a la derecha. |
-| `UxCampoFecha` | `UxCampo` | Fecha `dd/MM/yyyy`; admite vacío; calendario en popup. |
-| `UxInput` | `QWidget` | Compuesto etiqueta + campo + icono. `labelText`, `labelPosition`. |
-| `UxInputTexto` · `UxInputNumero` · `UxInputFecha` | `UxInput` | Conveniencias que crean el campo del tipo correspondiente. |
+| `UxTextField` | `UxField` | Free text. `maxLength` and `uppercase`. |
+| `UxNumberField` | `UxField` | Numeric only. `integerDigits`, `decimalDigits`, `thousandsSeparator`; right-aligned. |
+| `UxDateField` | `UxField` | `dd/MM/yyyy` date; allows empty values; popup calendar. |
+| `UxInput` | `QWidget` | Composite label + field + icon. `labelText`, `labelPosition`. |
+| `UxTextInput` · `UxNumberInput` · `UxDateInput` | `UxInput` | Convenience classes that create the corresponding field type. |
 
 <details>
-<summary><b>Propiedades (<code>Q_PROPERTY</code>)</b></summary>
+<summary><b>Properties (<code>Q_PROPERTY</code>)</b></summary>
 
-Todas las propiedades tuneables están declaradas como `Q_PROPERTY` (y los enums con
-`Q_ENUM`), de modo que un futuro plugin de Qt Designer pueda exponerlas.
+All configurable properties are declared as `Q_PROPERTY` (and enums with `Q_ENUM`),
+so that a future Qt Designer plugin can expose them.
 
-| Clase | Propiedades |
+| Class | Properties |
 |---|---|
-| `UxCampo` | `requerido`, `mostrarSelector`, `icono`, `colorFocoClaro`, `colorFocoOscuro` |
-| `UxCampoTexto` | `mayusculas` (+ `maxLength` heredada de `QLineEdit`) |
-| `UxCampoNumero` | `digitosEnteros`, `digitosDecimales`, `separadorMiles` |
-| `UxInput` | `labelText`, `labelPosition` (`Izquierda` \| `Arriba`), `text`, `maxLength`, `requerido` |
+| `UxField` | `required`, `showSelector`, `icon`, `lightFocusColor`, `darkFocusColor` |
+| `UxTextField` | `uppercase` (+ `maxLength` inherited from `QLineEdit`) |
+| `UxNumberField` | `integerDigits`, `decimalDigits`, `thousandsSeparator` |
+| `UxInput` | `labelText`, `labelPosition` (`Left` \| `Above`), `text`, `maxLength`, `required` |
 
 </details>
 
-## 🔎 El botón selector
+## 🔎 The Selection Button
 
-El icono al final del campo **no busca ni elige por su cuenta**: al pulsarlo emite
-`seleccionSolicitada()`. Tu código decide qué abrir (habitualmente un diálogo modal
-de elección) y qué devolver al campo:
+The icon at the end of the field **does not search or select on its own**: clicking
+it emits `selectionRequested()`. Your code decides what to open (usually a modal
+selection dialog) and what to return to the field:
 
 ```cpp
-auto *articulo = new UxInputTexto("Artículo");
-articulo->campoTexto()->setMostrarSelector(true);   // icono "…" al final
-connect(articulo, &UxInput::seleccionSolicitada, this, [=] {
-    // abre tu diálogo de elección y, al aceptar:
-    articulo->setText(valorElegido);
+auto *article = new UxTextInput("Article");
+article->textField()->setShowSelector(true);   // trailing "..." icon
+connect(article, &UxInput::selectionRequested, this, [=] {
+  // Open your selection dialog and, upon acceptance:
+    article->setText(selectedValue);
 });
 ```
 
-En `UxCampoFecha` el icono es un calendario, siempre visible, que abre un
-`QCalendarWidget` y escribe la fecha elegida.
+In `UxDateField`, the always-visible icon is a calendar that opens a
+`QCalendarWidget` and writes the selected date.
 
-## 🛠️ Compilar la librería y la demo
+## 🛠️ Build the Library and Demo
+
+### Linux
+
+Qt installed from distribution packages is detected automatically:
 
 ```bash
-cmake -S . -B build -G Ninja -DCMAKE_PREFIX_PATH=<ruta_qt>/mingw_64
+cmake -S . -B build-linux -G Ninja -DCMAKE_BUILD_TYPE=Debug
+cmake --build build-linux
+./build-linux/demo/UxWidgetsDemo
+```
+
+In a graphical session, the final command starts the demo. To distribute a Qt
+application on Linux, use the distribution's packaging mechanism or a compatible
+deployment tool, since this project does not package it.
+
+### Windows
+
+```bash
+cmake -S . -B build -G Ninja -DCMAKE_PREFIX_PATH=<qt-path>/mingw_64
 cmake --build build
 ./build/demo/UxWidgetsDemo
 ```
 
-La opción `UXWIDGETS_BUILD_DEMO` (ON por defecto) construye `UxWidgetsDemo`, una app
-que ejercita los tres controles. En Windows, un paso `POST_BUILD` ejecuta
-`windeployqt` y copia las DLLs de Qt y las runtimes de MinGW junto al ejecutable, de
-modo que arranque con doble clic sin tener Qt en el `PATH`.
+The `UXWIDGETS_BUILD_DEMO` option (ON by default) builds `UxWidgetsDemo`, an app
+that exercises all three controls. On Windows, a `POST_BUILD` step runs
+`windeployqt` and copies Qt DLLs and MinGW runtimes next to the executable, so it
+can launch by double-clicking without Qt in `PATH`.
 
-## 🗺️ Hoja de ruta
+## 🗺️ Roadmap
 
-- [ ] Plugin de **Qt Designer** que exponga los controles y sus propiedades en la paleta.
-- [ ] Aviso de requerido **adaptado al tema** (hoy usa un color claro fijo).
-- [ ] Nuevos controles siguiendo el mismo patrón (combo, check…).
-- [ ] Empaquetado instalable (`find_package(UxWidgets)`) además de `add_subdirectory`.
+- [ ] **Qt Designer** plugin that exposes controls and their properties in the palette.
+- [ ] **Theme-aware** required-field warning (currently uses a fixed light color).
+- [ ] New controls following the same pattern (combo box, check box, etc.).
+- [ ] Installable package (`find_package(UxWidgets)`) in addition to `add_subdirectory`.
 
-## 📄 Licencia
+## 📄 License
 
-UxWidgets se distribuye bajo licencia **MIT** (ver [`LICENSE`](LICENSE)): puedes
-usarlo, copiarlo, modificarlo y redistribuirlo libremente conservando el aviso de
-copyright.
+UxWidgets is distributed under the **MIT** license (see [`LICENSE`](LICENSE)): you
+may use, copy, modify, and redistribute it freely while retaining the copyright
+notice.
 
-Esta librería **depende de Qt** pero no lo incluye. Qt se distribuye bajo su propia
-licencia (**LGPLv3** en su edición open source, o licencia comercial). Si compilas y
-**distribuyes un binario** que enlaza Qt, debes cumplir los términos de la LGPL de Qt:
-enlazar Qt de forma dinámica (como hace la demo, con las DLLs de Qt), incluir el texto
-de la licencia de Qt e indicar dónde obtener su código fuente. Ese cumplimiento
-corresponde a quien construye y distribuye la aplicación final, no a este repositorio
-de código fuente. Más información en <https://www.qt.io/licensing>.
+This library **depends on Qt** but does not include it. Qt is distributed under its
+own license (**LGPLv3** in its open-source edition, or a commercial license). If you
+build and **distribute a binary** that links Qt, you must comply with the Qt LGPL:
+link Qt dynamically (as the demo does with Qt DLLs), include the Qt license text, and
+state where its source code can be obtained. That compliance is the responsibility of
+the person building and distributing the final application, not this source-code
+repository. More information at <https://www.qt.io/licensing>.

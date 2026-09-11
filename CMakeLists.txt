@@ -2,9 +2,8 @@ cmake_minimum_required(VERSION 3.21)
 
 project(UxWidgets LANGUAGES CXX)
 
-# Librería de controles Qt reutilizables (campo tipado + control compuesto
-# etiqueta/campo/icono). Autocontenida: no depende de ninguna aplicación,
-# consumible desde cualquier proyecto Qt.
+# Reusable Qt controls library (typed field + composite label/field/icon
+# control). It is standalone and consumable from any Qt project.
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -13,25 +12,25 @@ set(CMAKE_AUTOMOC ON)
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
 
 set(UXWIDGETS_HEADERS
-    include/UxWidgets/UxCampo.h
-    include/UxWidgets/UxCampoTexto.h
-    include/UxWidgets/UxCampoNumero.h
-    include/UxWidgets/UxCampoFecha.h
+    include/UxWidgets/UxField.h
+    include/UxWidgets/UxTextField.h
+    include/UxWidgets/UxNumberField.h
+    include/UxWidgets/UxDateField.h
     include/UxWidgets/UxInput.h
-    include/UxWidgets/UxInputTexto.h
-    include/UxWidgets/UxInputNumero.h
-    include/UxWidgets/UxInputFecha.h
+    include/UxWidgets/UxTextInput.h
+    include/UxWidgets/UxNumberInput.h
+    include/UxWidgets/UxDateInput.h
 )
 
 set(UXWIDGETS_SOURCES
-    src/UxCampo.cpp
-    src/UxCampoTexto.cpp
-    src/UxCampoNumero.cpp
-    src/UxCampoFecha.cpp
+    src/UxField.cpp
+    src/UxTextField.cpp
+    src/UxNumberField.cpp
+    src/UxDateField.cpp
     src/UxInput.cpp
-    src/UxInputTexto.cpp
-    src/UxInputNumero.cpp
-    src/UxInputFecha.cpp
+    src/UxTextInput.cpp
+    src/UxNumberInput.cpp
+    src/UxDateInput.cpp
 )
 
 add_library(UxWidgets STATIC ${UXWIDGETS_SOURCES} ${UXWIDGETS_HEADERS})
@@ -48,8 +47,8 @@ target_link_libraries(UxWidgets PUBLIC
     Qt6::Widgets
 )
 
-# App de demostración para validar los controles sin acoplarse a ninguna aplicación.
-option(UXWIDGETS_BUILD_DEMO "Construir la app de demostración de UxWidgets" ON)
+# Demo application for validating controls without coupling them to an application.
+option(UXWIDGETS_BUILD_DEMO "Build the UxWidgets demo application" ON)
 if(UXWIDGETS_BUILD_DEMO)
     add_subdirectory(demo)
 endif()

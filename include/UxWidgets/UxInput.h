@@ -4,53 +4,51 @@
 #include <QString>
 
 class QLabel;
-class UxCampo;
+class UxField;
 
 /**
- * Control compuesto: etiqueta (QLabel) + un campo de la capa de campo (UxCampo)
- * como una sola unidad, para no crear y alinear tres widgets por campo. La
- * etiqueta puede situarse a la izquierda o arriba. Reenvía al campo interno las
- * propiedades relevantes y reemite su señal de selección.
+ * Composite control: label (QLabel) + a field-layer control (UxField) as a
+ * single unit. The label can be placed to the left or above the field. Relevant
+ * properties and the selection signal are forwarded from the internal field.
  */
 class UxInput : public QWidget
 {
     Q_OBJECT
     Q_PROPERTY(QString labelText READ labelText WRITE setLabelText)
-    Q_PROPERTY(PosicionEtiqueta labelPosition READ labelPosition WRITE setLabelPosition)
+    Q_PROPERTY(LabelPosition labelPosition READ labelPosition WRITE setLabelPosition)
     Q_PROPERTY(QString text READ text WRITE setText)
     Q_PROPERTY(int maxLength READ maxLength WRITE setMaxLength)
-    Q_PROPERTY(bool requerido READ requerido WRITE setRequerido)
+    Q_PROPERTY(bool required READ required WRITE setRequired)
 
 public:
-    enum PosicionEtiqueta { Izquierda, Arriba };
-    Q_ENUM(PosicionEtiqueta)
+    enum LabelPosition { Left, Above };
+    Q_ENUM(LabelPosition)
 
-    /// Toma posesión de `campo` (lo reparenta dentro del compuesto).
-    explicit UxInput(UxCampo *campo, QWidget *parent = nullptr);
+    /// Takes ownership of field by reparenting it into the composite control.
+    explicit UxInput(UxField *field, QWidget *parent = nullptr);
 
-    UxCampo *campo() const { return m_campo; }
+    UxField *field() const { return m_field; }
 
     QString labelText() const;
-    void setLabelText(const QString &texto);
+    void setLabelText(const QString &text);
 
-    PosicionEtiqueta labelPosition() const { return m_posicion; }
-    void setLabelPosition(PosicionEtiqueta posicion);
+    LabelPosition labelPosition() const { return m_labelPosition; }
+    void setLabelPosition(LabelPosition position);
 
-    // Reenvíos al campo interno.
     QString text() const;
-    void setText(const QString &texto);
+    void setText(const QString &text);
     int maxLength() const;
-    void setMaxLength(int longitud);
-    bool requerido() const;
-    void setRequerido(bool requerido);
+    void setMaxLength(int length);
+    bool required() const;
+    void setRequired(bool required);
 
 signals:
-    void seleccionSolicitada();
+    void selectionRequested();
 
 private:
-    void reconstruirLayout();
+    void rebuildLayout();
 
-    QLabel *m_etiqueta = nullptr;
-    UxCampo *m_campo = nullptr;
-    PosicionEtiqueta m_posicion = Izquierda;
+    QLabel *m_label = nullptr;
+    UxField *m_field = nullptr;
+    LabelPosition m_labelPosition = Left;
 };

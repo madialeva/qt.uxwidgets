@@ -1,5 +1,5 @@
-# App de demostración de UxWidgets. Valida los tres controles sin acoplarse a
-# ninguna aplicación. AUTOMOC se hereda del CMakeLists.txt padre.
+# UxWidgets demo application. It validates the three controls without coupling
+# them to an application. AUTOMOC is inherited from the parent CMakeLists.txt.
 
 add_executable(UxWidgetsDemo main.cpp)
 
@@ -8,10 +8,10 @@ target_link_libraries(UxWidgetsDemo PRIVATE
     Qt6::Widgets
 )
 
-# --- Despliegue autocontenido de la demo (solo Windows) --------------------
-# Tras compilar, windeployqt copia las DLLs y plugins de Qt junto al .exe; con
-# --compiler-runtime añade también la runtime de MinGW. Así la demo arranca con
-# doble clic sin necesidad de tener el bin de Qt en el PATH.
+# --- Self-contained demo deployment (Windows only) --------------------------
+# After building, windeployqt copies Qt DLLs and plugins next to the executable.
+# --compiler-runtime also copies the MinGW runtime so the demo can launch by
+# double-clicking without Qt binaries in PATH.
 if(WIN32)
     get_target_property(_qmake_exe Qt6::qmake IMPORTED_LOCATION)
     get_filename_component(_qt_bin_dir "${_qmake_exe}" DIRECTORY)
@@ -22,11 +22,11 @@ if(WIN32)
             COMMAND "${WINDEPLOYQT_EXECUTABLE}"
                     --no-translations --compiler-runtime
                     "$<TARGET_FILE:UxWidgetsDemo>"
-            COMMENT "Desplegando Qt junto a UxWidgetsDemo (windeployqt)"
+            COMMENT "Deploying Qt next to UxWidgetsDemo (windeployqt)"
             VERBATIM)
 
-        # Refuerzo: copiar explícitamente las runtimes de MinGW por si la versión
-        # de windeployqt no las trajera todas (p. ej. libgcc).
+        # Copy MinGW runtimes explicitly in case windeployqt does not deploy all
+        # of them, for example libgcc.
         get_filename_component(_mingw_bin "${CMAKE_CXX_COMPILER}" DIRECTORY)
         foreach(_dll libgcc_s_seh-1 libstdc++-6 libwinpthread-1)
             if(EXISTS "${_mingw_bin}/${_dll}.dll")
@@ -38,6 +38,6 @@ if(WIN32)
             endif()
         endforeach()
     else()
-        message(WARNING "windeployqt no encontrado; la demo no se desplegará automáticamente.")
+        message(WARNING "windeployqt was not found; the demo will not be deployed automatically.")
     endif()
 endif()

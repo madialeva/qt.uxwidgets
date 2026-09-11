@@ -1,9 +1,9 @@
-// Demostración de UxWidgets: instancia los tres controles compuestos con la
-// etiqueta a la izquierda y arriba, un campo requerido, y un botón selector
-// conectado a un diálogo modal de ejemplo (elegir un analgésico).
+// UxWidgets demo: instantiates the three composite controls with labels on the
+// left and above, a required field, and a selection button connected to an
+// example modal dialog.
 //
-// Sin argumentos usa el tema del sistema. Con --dark o --light fuerza una paleta
-// oscura o clara (Fusion), útil para ver el resaltado de foco adaptado al tema.
+// It uses the system theme by default. --dark and --light force Fusion palettes
+// to demonstrate theme-aware focus highlighting.
 
 #include <QApplication>
 #include <QGroupBox>
@@ -12,48 +12,46 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-#include "UxWidgets/UxCampoNumero.h"
-#include "UxWidgets/UxCampoTexto.h"
-#include "UxWidgets/UxInputFecha.h"
-#include "UxWidgets/UxInputNumero.h"
-#include "UxWidgets/UxInputTexto.h"
+#include "UxWidgets/UxDateInput.h"
+#include "UxWidgets/UxNumberField.h"
+#include "UxWidgets/UxNumberInput.h"
+#include "UxWidgets/UxTextField.h"
+#include "UxWidgets/UxTextInput.h"
 
-// Aplica una paleta oscura estándar sobre el estilo Fusion.
-static void aplicarTemaOscuro(QApplication &app)
+static void applyDarkTheme(QApplication &app)
 {
     app.setStyle(QStringLiteral("Fusion"));
-    QPalette p;
-    p.setColor(QPalette::Window, QColor(53, 53, 53));
-    p.setColor(QPalette::WindowText, Qt::white);
-    p.setColor(QPalette::Base, QColor(35, 35, 35));
-    p.setColor(QPalette::AlternateBase, QColor(53, 53, 53));
-    p.setColor(QPalette::ToolTipBase, Qt::white);
-    p.setColor(QPalette::ToolTipText, Qt::white);
-    p.setColor(QPalette::Text, Qt::white);
-    p.setColor(QPalette::Button, QColor(53, 53, 53));
-    p.setColor(QPalette::ButtonText, Qt::white);
-    p.setColor(QPalette::Highlight, QColor(42, 130, 218));
-    p.setColor(QPalette::HighlightedText, Qt::black);
-    app.setPalette(p);
+    QPalette palette;
+    palette.setColor(QPalette::Window, QColor(53, 53, 53));
+    palette.setColor(QPalette::WindowText, Qt::white);
+    palette.setColor(QPalette::Base, QColor(35, 35, 35));
+    palette.setColor(QPalette::AlternateBase, QColor(53, 53, 53));
+    palette.setColor(QPalette::ToolTipBase, Qt::white);
+    palette.setColor(QPalette::ToolTipText, Qt::white);
+    palette.setColor(QPalette::Text, Qt::white);
+    palette.setColor(QPalette::Button, QColor(53, 53, 53));
+    palette.setColor(QPalette::ButtonText, Qt::white);
+    palette.setColor(QPalette::Highlight, QColor(42, 130, 218));
+    palette.setColor(QPalette::HighlightedText, Qt::black);
+    app.setPalette(palette);
 }
 
-// Aplica una paleta clara estándar sobre el estilo Fusion.
-static void aplicarTemaClaro(QApplication &app)
+static void applyLightTheme(QApplication &app)
 {
     app.setStyle(QStringLiteral("Fusion"));
-    QPalette p;
-    p.setColor(QPalette::Window, QColor(0xF0, 0xF0, 0xF0));
-    p.setColor(QPalette::WindowText, Qt::black);
-    p.setColor(QPalette::Base, Qt::white);
-    p.setColor(QPalette::AlternateBase, QColor(0xF7, 0xF7, 0xF7));
-    p.setColor(QPalette::ToolTipBase, Qt::black);
-    p.setColor(QPalette::ToolTipText, Qt::black);
-    p.setColor(QPalette::Text, Qt::black);
-    p.setColor(QPalette::Button, QColor(0xF0, 0xF0, 0xF0));
-    p.setColor(QPalette::ButtonText, Qt::black);
-    p.setColor(QPalette::Highlight, QColor(0x30, 0x8C, 0xC6));
-    p.setColor(QPalette::HighlightedText, Qt::white);
-    app.setPalette(p);
+    QPalette palette;
+    palette.setColor(QPalette::Window, QColor(0xF0, 0xF0, 0xF0));
+    palette.setColor(QPalette::WindowText, Qt::black);
+    palette.setColor(QPalette::Base, Qt::white);
+    palette.setColor(QPalette::AlternateBase, QColor(0xF7, 0xF7, 0xF7));
+    palette.setColor(QPalette::ToolTipBase, Qt::black);
+    palette.setColor(QPalette::ToolTipText, Qt::black);
+    palette.setColor(QPalette::Text, Qt::black);
+    palette.setColor(QPalette::Button, QColor(0xF0, 0xF0, 0xF0));
+    palette.setColor(QPalette::ButtonText, Qt::black);
+    palette.setColor(QPalette::Highlight, QColor(0x30, 0x8C, 0xC6));
+    palette.setColor(QPalette::HighlightedText, Qt::white);
+    app.setPalette(palette);
 }
 
 int main(int argc, char *argv[])
@@ -61,55 +59,53 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
     if (app.arguments().contains(QStringLiteral("--dark")))
-        aplicarTemaOscuro(app);
+        applyDarkTheme(app);
     else if (app.arguments().contains(QStringLiteral("--light")))
-        aplicarTemaClaro(app);
+        applyLightTheme(app);
 
-    QWidget ventana;
-    ventana.setWindowTitle(QStringLiteral("Demo UxWidgets"));
-    auto *disposicion = new QVBoxLayout(&ventana);
+    QWidget window;
+    window.setWindowTitle(QStringLiteral("UxWidgets Demo"));
+    auto *layout = new QVBoxLayout(&window);
 
-    // --- Etiqueta a la izquierda -------------------------------------------
-    auto *grupoIzq = new QGroupBox(QStringLiteral("Etiqueta a la izquierda"), &ventana);
-    auto *formIzq = new QVBoxLayout(grupoIzq);
+    auto *leftGroup = new QGroupBox(QStringLiteral("Label on the left"), &window);
+    auto *leftForm = new QVBoxLayout(leftGroup);
 
-    auto *nombre = new UxInputTexto(QStringLiteral("Nombre"));
-    nombre->campoTexto()->setMayusculas(true);
-    nombre->setMaxLength(20);
-    nombre->setRequerido(true); // requerido: se resalta al estar vacío
-    formIzq->addWidget(nombre);
+    auto *name = new UxTextInput(QStringLiteral("Name"));
+    name->textField()->setUppercase(true);
+    name->setMaxLength(20);
+    name->setRequired(true);
+    leftForm->addWidget(name);
 
-    auto *importe = new UxInputNumero(QStringLiteral("Importe"));
-    importe->campoNumero()->setDigitosEnteros(6);
-    importe->campoNumero()->setDigitosDecimales(2);
-    importe->campoNumero()->setSeparadorMiles(true);
-    formIzq->addWidget(importe);
+    auto *amount = new UxNumberInput(QStringLiteral("Amount"));
+    amount->numberField()->setIntegerDigits(6);
+    amount->numberField()->setDecimalDigits(2);
+    amount->numberField()->setThousandsSeparator(true);
+    leftForm->addWidget(amount);
 
-    auto *analgesico = new UxInputTexto(QStringLiteral("Analgésico"));
-    analgesico->setRequerido(true); // requerido y sin foco al abrir => fondo bisque visible
-    analgesico->campoTexto()->setMostrarSelector(true); // botón selector "…"
-    QObject::connect(analgesico, &UxInput::seleccionSolicitada, &ventana, [&ventana, analgesico] {
-        const int r = QMessageBox::question(
-            &ventana, QStringLiteral("Seleccionar analgésico"),
-            QStringLiteral("Aquí se abriría el diálogo de elección.\n¿Elegir «Paracetamol»?"));
-        if (r == QMessageBox::Yes)
-            analgesico->setText(QStringLiteral("Paracetamol"));
+    auto *analgesic = new UxTextInput(QStringLiteral("Analgesic"));
+    analgesic->setRequired(true);
+    analgesic->textField()->setShowSelector(true);
+    QObject::connect(analgesic, &UxInput::selectionRequested, &window, [&window, analgesic] {
+        const int response = QMessageBox::question(
+            &window, QStringLiteral("Select analgesic"),
+            QStringLiteral("The selection dialog would open here.\nSelect \"Paracetamol\"?"));
+        if (response == QMessageBox::Yes)
+            analgesic->setText(QStringLiteral("Paracetamol"));
     });
-    formIzq->addWidget(analgesico);
+    leftForm->addWidget(analgesic);
 
-    disposicion->addWidget(grupoIzq);
+    layout->addWidget(leftGroup);
 
-    // --- Etiqueta arriba ----------------------------------------------------
-    auto *grupoArriba = new QGroupBox(QStringLiteral("Etiqueta arriba"), &ventana);
-    auto *formArriba = new QVBoxLayout(grupoArriba);
+    auto *aboveGroup = new QGroupBox(QStringLiteral("Label above"), &window);
+    auto *aboveForm = new QVBoxLayout(aboveGroup);
 
-    auto *fecha = new UxInputFecha(QStringLiteral("Fecha de nacimiento"));
-    fecha->setLabelPosition(UxInput::Arriba); // fecha vacía admitida (no obligatoria)
-    formArriba->addWidget(fecha);
+    auto *date = new UxDateInput(QStringLiteral("Date of birth"));
+    date->setLabelPosition(UxInput::Above);
+    aboveForm->addWidget(date);
 
-    disposicion->addWidget(grupoArriba);
+    layout->addWidget(aboveGroup);
 
-    ventana.resize(360, 260);
-    ventana.show();
+    window.resize(360, 260);
+    window.show();
     return app.exec();
 }

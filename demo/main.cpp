@@ -1,18 +1,21 @@
-// UxWidgets demo: instantiates the three composite controls with labels on the
-// left and above, a required field, and a selection button connected to an
-// example modal dialog.
+// UxWidgets demo: instantiates the composite controls with labels on the left
+// and above, a required field, a selection button connected to an example modal
+// dialog, a non-editable label, and a combo box composite.
 //
 // It uses the system theme by default. --dark and --light force Fusion palettes
 // to demonstrate theme-aware focus highlighting.
 
 #include <QApplication>
+#include <QComboBox>
 #include <QGroupBox>
 #include <QMessageBox>
 #include <QPalette>
 #include <QVBoxLayout>
 #include <QWidget>
 
+#include "UxWidgets/UxComboInput.h"
 #include "UxWidgets/UxDateInput.h"
+#include "UxWidgets/UxLabel.h"
 #include "UxWidgets/UxNumberField.h"
 #include "UxWidgets/UxNumberInput.h"
 #include "UxWidgets/UxTextField.h"
@@ -94,7 +97,29 @@ int main(int argc, char *argv[])
     });
     leftForm->addWidget(analgesic);
 
+    auto *sex = new UxComboInput(QStringLiteral("Sex"));
+    sex->comboBox()->addItem(QStringLiteral("Female"));
+    sex->comboBox()->addItem(QStringLiteral("Male"));
+    leftForm->addWidget(sex);
+
     layout->addWidget(leftGroup);
+
+    auto *labelGroup = new QGroupBox(QStringLiteral("Non-editable label"), &window);
+    auto *labelForm = new QVBoxLayout(labelGroup);
+
+    auto *code = new UxLabel(QStringLiteral("Patient code: 12345"));
+    code->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    labelForm->addWidget(code);
+
+    auto *detail = new UxLabel(QStringLiteral("Show details"));
+    detail->setHighlight(true);
+    QObject::connect(detail, &UxLabel::clicked, &window, [&window] {
+        QMessageBox::information(&window, QStringLiteral("UxLabel"),
+                                 QStringLiteral("The non-editable label was clicked."));
+    });
+    labelForm->addWidget(detail);
+
+    layout->addWidget(labelGroup);
 
     auto *aboveGroup = new QGroupBox(QStringLiteral("Label above"), &window);
     auto *aboveForm = new QVBoxLayout(aboveGroup);
@@ -105,7 +130,7 @@ int main(int argc, char *argv[])
 
     layout->addWidget(aboveGroup);
 
-    window.resize(360, 260);
+    window.resize(360, 420);
     window.show();
     return app.exec();
 }

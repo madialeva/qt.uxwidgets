@@ -20,6 +20,9 @@ set(UXWIDGETS_HEADERS
     include/UxWidgets/UxTextInput.h
     include/UxWidgets/UxNumberInput.h
     include/UxWidgets/UxDateInput.h
+    include/UxWidgets/UxLabel.h
+    include/UxWidgets/UxComboInput.h
+    include/UxWidgets/UxCheck.h
 )
 
 set(UXWIDGETS_SOURCES
@@ -31,6 +34,9 @@ set(UXWIDGETS_SOURCES
     src/UxTextInput.cpp
     src/UxNumberInput.cpp
     src/UxDateInput.cpp
+    src/UxLabel.cpp
+    src/UxComboInput.cpp
+    src/UxCheck.cpp
 )
 
 add_library(UxWidgets STATIC ${UXWIDGETS_SOURCES} ${UXWIDGETS_HEADERS})

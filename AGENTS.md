@@ -25,6 +25,10 @@ not contain application-specific business logic.
   state.
 - **Composite layer** (`UxInput : QWidget`) combines a label, field, and layout;
   `UxTextInput`, `UxNumberInput`, and `UxDateInput` create the appropriate field.
+- **Standalone controls** outside the typed-field layer: `UxLabel : QLabel`
+  (non-editable label), `UxComboInput : QWidget` (label + `QComboBox`), and
+  `UxCheck : QCheckBox` (check box with focus highlighting, distinct checked
+  text, and a read-only mode).
 
 The public catalog, properties, and usage examples are in `README.md`.
 
@@ -48,7 +52,7 @@ Baseline specs live in `openspec/specs/`; archived changes are in
 ├── README.md               (control catalog, properties, consumption, and build guide)
 ├── include/UxWidgets/      (public headers, included as <UxWidgets/UxInput.h>)
 ├── src/                    (implementations)
-└── demo/                   (UxWidgetsDemo exercises the three controls; on Windows,
+└── demo/                   (UxWidgetsDemo exercises the controls; on Windows,
                              POST_BUILD uses windeployqt for self-contained deployment)
 ```
 
@@ -140,12 +144,18 @@ Completed:
   required empty fields use bisque feedback, and focus highlighting adapts to themes.
 - Configurable settings use `Q_PROPERTY`; the Windows demo deploys with
   `windeployqt`.
+- `UxLabel` (non-editable label with alignment, multiline, hover highlight,
+  fill-with-dots, and optional image) and `UxComboInput` (label + combo box)
+  extend the catalog beyond the typed-field layer.
+- `UxCheck` (check box with theme-aware focus background, distinct checked
+  text color, and a `readOnly` mode that keeps the normal look) completes the
+  standalone controls.
 
 Future ideas:
 
 - A **Qt Designer** plugin exposing controls and their `Q_PROPERTY` values.
 - A theme-aware required-field warning; bisque is currently a fixed light color.
-- Additional controls such as combo boxes and check boxes, following the two-layer
-  pattern.
+- Additional controls such as radio buttons and grids, following the
+  same pattern.
 - An installable CMake package (`find_package(UxWidgets)`) in addition to
   `add_subdirectory`.

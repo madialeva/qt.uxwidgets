@@ -31,7 +31,9 @@ ready for Designer.
 `UxWidgets` packages the "label + field + icon" pattern repeated throughout desktop
 application forms. Instead of creating, aligning, and validating three widgets for
 each value, place **one** control that already knows how to behave as text, a number,
-or a date.
+or a date. It also includes a non-editable label, a label + combo box composite
+for values that are shown or selected rather than typed, and a check box with
+theme-aware focus highlighting and a read-only mode.
 
 ## ✨ Features
 
@@ -39,6 +41,13 @@ or a date.
   be placed to the left or above.
 - 🔤 **Three typed variants** -- text (with maximum length and uppercase), number
   (integer/decimal digits and thousands separator), and date (`dd/MM/yyyy`).
+- 🔽 **Combo composite** -- `UxComboInput` pairs a label with a `QComboBox` using the
+  same left/above placement.
+- 🔒 **Non-editable label** -- `UxLabel` shows read-only text with alignment,
+  optional image, hover highlight, and fill-with-dots.
+- ☑️ **Check box** -- `UxCheck` highlights its background while focused (theme-aware),
+  shows a distinct text color while checked, and offers a `readOnly` mode that
+  ignores user toggles while keeping its normal look.
 - 📅 **Empty-tolerant date** -- built on `QLineEdit`, it accepts an empty field when
   not required (something `QDateEdit` does not naturally allow) and provides a popup
   calendar.
@@ -84,6 +93,11 @@ Two-layer architecture: controls inherit from standard Qt widgets.
   forwarding. The `Ux{Text,Number,Date}Input` convenience classes create the
   appropriate field type.
 
+Outside the typed-field layer, the library also ships three standalone controls:
+`UxLabel : QLabel` (non-editable label), `UxComboInput : QWidget` (label +
+`QComboBox`), and `UxCheck : QCheckBox` (check box with focus highlighting,
+distinct checked text, and a read-only mode).
+
 ## 📋 Requirements
 
 - **Qt 6** (Core, Gui, Widgets)
@@ -114,6 +128,9 @@ target_link_libraries(MyApp PRIVATE UxWidgets::UxWidgets)
 #include <UxWidgets/UxTextInput.h>
 #include <UxWidgets/UxNumberInput.h>
 #include <UxWidgets/UxDateInput.h>
+#include <UxWidgets/UxComboInput.h>
+#include <UxWidgets/UxCheck.h>
+#include <UxWidgets/UxLabel.h>
 ```
 
 When using it as a dependency, disable the demo:
@@ -141,6 +158,25 @@ amount->numberField()->setThousandsSeparator(true);
 // Date with the label above (allows empty values)
 auto *date = new UxDateInput("Date");
 date->setLabelPosition(UxInput::Above);
+
+// Combo box composite: label + QComboBox, label on the left
+auto *sex = new UxComboInput("Sex");
+sex->comboBox()->addItem("Female");
+sex->comboBox()->addItem("Male");
+
+// Non-editable label: read-only text, selectable, with a hover highlight
+auto *code = new UxLabel("Patient code: 12345");
+code->setTextInteractionFlags(Qt::TextSelectableByMouse);
+
+auto *details = new UxLabel("Show details");
+details->setHighlight(true);
+connect(details, &UxLabel::clicked, this, [] { /* open the details view */ });
+
+// Check box with a read-only, pre-verified flag
+auto *notify = new UxCheck("Notify by phone");
+auto *verified = new UxCheck("Verified");
+verified->setChecked(true);
+verified->setReadOnly(true);
 ```
 
 ## 🧭 Control Catalog
@@ -152,6 +188,9 @@ date->setLabelPosition(UxInput::Above);
 | `UxDateField` | `UxField` | `dd/MM/yyyy` date; allows empty values; popup calendar. |
 | `UxInput` | `QWidget` | Composite label + field + icon. `labelText`, `labelPosition`. |
 | `UxTextInput` · `UxNumberInput` · `UxDateInput` | `UxInput` | Convenience classes that create the corresponding field type. |
+| `UxComboInput` | `QWidget` | Composite label + `QComboBox`. `labelText`, `labelPosition`; the combo is exposed via `comboBox()`. |
+| `UxLabel` | `QLabel` | Non-editable label. `multiline`, `highlight`, `highlightColor`, `fillWithDots`, `image`; emits `clicked()`. |
+| `UxCheck` | `QCheckBox` | Check box. Focus background tint (theme-aware), distinct text color while checked, `readOnly` mode that keeps the normal look. |
 
 <details>
 <summary><b>Properties (<code>Q_PROPERTY</code>)</b></summary>
@@ -165,6 +204,9 @@ so that a future Qt Designer plugin can expose them.
 | `UxTextField` | `uppercase` (+ `maxLength` inherited from `QLineEdit`) |
 | `UxNumberField` | `integerDigits`, `decimalDigits`, `thousandsSeparator` |
 | `UxInput` | `labelText`, `labelPosition` (`Left` \| `Above`), `text`, `maxLength`, `required` |
+| `UxComboInput` | `labelText`, `labelPosition` (`Left` \| `Above`) |
+| `UxLabel` | `multiline`, `highlight`, `highlightColor`, `fillWithDots`, `image` |
+| `UxCheck` | `readOnly` |
 
 </details>
 
@@ -211,7 +253,7 @@ cmake --build build
 ```
 
 The `UXWIDGETS_BUILD_DEMO` option (ON by default) builds `UxWidgetsDemo`, an app
-that exercises all three controls. On Windows, a `POST_BUILD` step runs
+that exercises the controls. On Windows, a `POST_BUILD` step runs
 `windeployqt` and copies Qt DLLs and MinGW runtimes next to the executable, so it
 can launch by double-clicking without Qt in `PATH`.
 
@@ -219,7 +261,7 @@ can launch by double-clicking without Qt in `PATH`.
 
 - [ ] **Qt Designer** plugin that exposes controls and their properties in the palette.
 - [ ] **Theme-aware** required-field warning (currently uses a fixed light color).
-- [ ] New controls following the same pattern (combo box, check box, etc.).
+- [ ] New controls following the same pattern (radio button, grid, etc.).
 - [ ] Installable package (`find_package(UxWidgets)`) in addition to `add_subdirectory`.
 
 ## 📄 License

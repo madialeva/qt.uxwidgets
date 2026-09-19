@@ -14,14 +14,14 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-#include "UxWidgets/UxComboInput.h"
-#include "UxWidgets/UxCheck.h"
-#include "UxWidgets/UxDateInput.h"
-#include "UxWidgets/UxLabel.h"
-#include "UxWidgets/UxNumberField.h"
-#include "UxWidgets/UxNumberInput.h"
-#include "UxWidgets/UxTextField.h"
-#include "UxWidgets/UxTextInput.h"
+#include <UxWidgets/UxComboInput.h>
+#include <UxWidgets/UxCheck.h>
+#include <UxWidgets/UxDateInput.h>
+#include <UxWidgets/UxLabel.h>
+#include <UxWidgets/UxNumberField.h>
+#include <UxWidgets/UxNumberInput.h>
+#include <UxWidgets/UxTextField.h>
+#include <UxWidgets/UxTextInput.h>
 
 static void applyDarkTheme(QApplication &app)
 {

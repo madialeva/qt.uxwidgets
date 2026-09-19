@@ -1,4 +1,4 @@
-#include "UxWidgets/UxCheck.h"
+#include <UxWidgets/UxCheck.h>
 
 #include <QEvent>
 #include <QFocusEvent>

@@ -7,7 +7,8 @@ y presentación de datos, autocontenido e independiente de cualquier aplicación
 Ofrece controles de entrada compuestos y configurables (texto, número o fecha)
 organizados en dos capas —un campo tipado que hereda de `QLineEdit` y un control
 compuesto etiqueta/campo/icono que hereda de `QWidget`—, además de una etiqueta no
-editable (`UxLabel`) y un compuesto de selección (`UxComboInput`), para no tener que
+editable (`UxLabel`), un compuesto de selección (`UxComboInput`) y una casilla de
+verificación (`UxCheck`), para no tener que
 crear y alinear varios widgets por cada campo en formularios densos.
 
 ## Requirements
@@ -26,7 +27,7 @@ La librería `UxWidgets` SHALL construirse como una biblioteca CMake independien
 - **THEN** puede incluir `<UxWidgets/UxInput.h>` e instanciar los controles sin dependencias externas
 
 ### Requirement: Arquitectura en capas (campo, compuesto e independientes)
-La librería SHALL organizar los controles de entrada en dos capas: una **capa de campo** cuyas clases heredan de `QLineEdit` (`UxField` base y las especializaciones `UxTextField`, `UxNumberField`, `UxDateField`), y una **capa compuesta** cuyas clases heredan de `QWidget` (`UxInput` y las conveniencias `UxTextInput`, `UxNumberInput`, `UxDateInput`). El comportamiento específico de cada tipo SHALL residir en la capa de campo. Fuera de la capa de campo, la librería SHALL ofrecer además controles independientes: la etiqueta no editable `UxLabel` (que hereda de `QLabel`) y el compuesto de selección `UxComboInput` (que hereda de `QWidget`).
+La librería SHALL organizar los controles de entrada en dos capas: una **capa de campo** cuyas clases heredan de `QLineEdit` (`UxField` base y las especializaciones `UxTextField`, `UxNumberField`, `UxDateField`), y una **capa compuesta** cuyas clases heredan de `QWidget` (`UxInput` y las conveniencias `UxTextInput`, `UxNumberInput`, `UxDateInput`). El comportamiento específico de cada tipo SHALL residir en la capa de campo. Fuera de la capa de campo, la librería SHALL ofrecer además controles independientes: la etiqueta no editable `UxLabel` (que hereda de `QLabel`), el compuesto de selección `UxComboInput` (que hereda de `QWidget`) y la casilla de verificación `UxCheck` (que hereda de `QCheckBox`).
 
 #### Scenario: Uso del campo suelto
 - **GIVEN** un formulario que solo necesita el campo sin etiqueta ni icono
@@ -39,9 +40,9 @@ La librería SHALL organizar los controles de entrada en dos capas: una **capa d
 - **THEN** obtiene un único widget que contiene la etiqueta, el campo de texto y el icono ya alineados
 
 #### Scenario: Uso de los controles independientes
-- **GIVEN** un formulario que necesita mostrar un valor de solo lectura o elegir de una lista
-- **WHEN** instancia un `UxLabel` o un `UxComboInput`
-- **THEN** obtiene respectivamente una etiqueta no editable o un compuesto etiqueta + desplegable, sin depender de la capa de campo
+- **GIVEN** un formulario que necesita mostrar un valor de solo lectura, elegir de una lista o marcar una opción
+- **WHEN** instancia un `UxLabel`, un `UxComboInput` o un `UxCheck`
+- **THEN** obtiene respectivamente una etiqueta no editable, un compuesto etiqueta + desplegable o una casilla de verificación, sin depender de la capa de campo
 
 ### Requirement: Campo de texto configurable
 `UxTextField` SHALL permitir la entrada de texto libre con una longitud máxima configurable, y SHALL poder forzar que todo lo tecleado y pegado aparezca en mayúsculas cuando se active esa opción, sin admitir minúsculas en ese modo.
@@ -177,6 +178,37 @@ Los campos SHALL integrar su botón de acción **dentro** del propio campo media
 - **WHEN** el texto es más estrecho que el ancho del control
 - **THEN** se completa con puntos el espacio libre hasta el borde del control
 
+### Requirement: Casilla de verificación con resaltado y modo de solo lectura
+`UxCheck` SHALL ofrecer una casilla de verificación (`QCheckBox`) con resaltado de fondo mientras tiene el foco de teclado, con un color adaptado al tema (claro/oscuro) que se actualiza si el tema de la aplicación cambia en caliente. SHALL mostrar el texto en un color diferenciado mientras la casilla esté marcada, también adaptado al tema. SHALL exponer un modo de solo lectura (`readOnly`) que ignore los cambios del usuario (ratón y teclado) manteniendo el aspecto normal (sin el aspecto de deshabilitado) y sin poder recibir el foco.
+
+#### Scenario: Casilla que recibe el foco en tema claro
+- **WHEN** el usuario enfoca con ratón o tabulador una casilla `UxCheck` editable en tema claro
+- **THEN** su fondo pasa al color de foco claro, indicando que es el control activo
+
+#### Scenario: Casilla que recibe el foco en tema oscuro
+- **WHEN** el usuario enfoca una casilla `UxCheck` editable en tema oscuro
+- **THEN** su fondo pasa al color de foco oscuro, manteniendo legible el texto claro
+
+#### Scenario: Texto diferenciado en estado marcado
+- **WHEN** la casilla está marcada
+- **THEN** su texto se muestra en el color de marcado del tema activo (granate en tema claro, rosa pálido en tema oscuro)
+
+#### Scenario: Cambio de tema en caliente
+- **WHEN** la aplicación cambia de tema (claro↔oscuro) mientras la casilla mantiene el foco o está marcada
+- **THEN** el resaltado de foco y el color de marcado se actualizan al color del nuevo tema
+
+#### Scenario: Casilla que pierde el foco
+- **WHEN** el foco pasa a otro control
+- **THEN** la casilla restaura su fondo normal, conservando el color de marcado si sigue marcada
+
+#### Scenario: Solo lectura ignora el ratón
+- **WHEN** una casilla `UxCheck` está en modo de solo lectura y el usuario pulsa sobre ella con el ratón
+- **THEN** su estado no cambia y conserva su aspecto normal (no aparece deshabilitada)
+
+#### Scenario: Solo lectura ignora el teclado y no recibe el foco
+- **WHEN** una casilla `UxCheck` está en modo de solo lectura
+- **THEN** no puede recibir el foco por tabulador y las teclas de activación (espacio) no cambian su estado, aunque el programa sí puede fijarlo con `setChecked`
+
 ### Requirement: Campo requerido con indicación visual
 Los controles SHALL exponer una propiedad de "requerido" que, cuando esté activa y el campo esté vacío, muestre una indicación visual diferenciada.
 
@@ -218,7 +250,7 @@ Los campos SHALL resaltar su fondo mientras tienen el foco, para que el usuario 
 - **THEN** muestra el color de foco del tema mientras esté activo, y vuelve al bisque al perderlo si sigue vacío
 
 ### Requirement: Propiedades expuestas para diseñador futuro
-Las propiedades públicas tuneables de los controles (texto de etiqueta, posición de etiqueta, longitud máxima, mayúsculas, requerido, dígitos enteros, dígitos decimales, separador de miles, mostrar selector, icono, color de foco claro, color de foco oscuro, multilínea, resalte, color de resalte, relleno con puntos e imagen) SHALL declararse como `Q_PROPERTY`, y los enumerados públicos con `Q_ENUM`, de forma que un futuro plugin de Qt Designer pueda exponerlas sin rediseñar los controles. La construcción de dicho plugin queda fuera de esta capability.
+Las propiedades públicas tuneables de los controles (texto de etiqueta, posición de etiqueta, longitud máxima, mayúsculas, requerido, dígitos enteros, dígitos decimales, separador de miles, mostrar selector, icono, color de foco claro, color de foco oscuro, multilínea, resalte, color de resalte, relleno con puntos, imagen y solo lectura) SHALL declararse como `Q_PROPERTY`, y los enumerados públicos con `Q_ENUM`, de forma que un futuro plugin de Qt Designer pueda exponerlas sin rediseñar los controles. La construcción de dicho plugin queda fuera de esta capability.
 
 #### Scenario: Propiedad accesible por el metaobjeto
 - **GIVEN** un control de la librería

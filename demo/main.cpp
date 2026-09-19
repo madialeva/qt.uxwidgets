@@ -1,6 +1,7 @@
 // UxWidgets demo: instantiates the composite controls with labels on the left
 // and above, a required field, a selection button connected to an example modal
-// dialog, a non-editable label, and a combo box composite.
+// dialog, a non-editable label, a combo box composite, and check boxes
+// (editable and read-only).
 //
 // It uses the system theme by default. --dark and --light force Fusion palettes
 // to demonstrate theme-aware focus highlighting.
@@ -14,6 +15,7 @@
 #include <QWidget>
 
 #include "UxWidgets/UxComboInput.h"
+#include "UxWidgets/UxCheck.h"
 #include "UxWidgets/UxDateInput.h"
 #include "UxWidgets/UxLabel.h"
 #include "UxWidgets/UxNumberField.h"
@@ -120,6 +122,23 @@ int main(int argc, char *argv[])
     labelForm->addWidget(detail);
 
     layout->addWidget(labelGroup);
+
+    auto *checkGroup = new QGroupBox(QStringLiteral("Check boxes"), &window);
+    auto *checkForm = new QVBoxLayout(checkGroup);
+
+    auto *notify = new UxCheck(QStringLiteral("Notify by phone"), checkGroup);
+    checkForm->addWidget(notify);
+
+    auto *consent = new UxCheck(QStringLiteral("Signed consent"), checkGroup);
+    consent->setChecked(true);
+    checkForm->addWidget(consent);
+
+    auto *verified = new UxCheck(QStringLiteral("Verified (read-only)"), checkGroup);
+    verified->setChecked(true);
+    verified->setReadOnly(true);
+    checkForm->addWidget(verified);
+
+    layout->addWidget(checkGroup);
 
     auto *aboveGroup = new QGroupBox(QStringLiteral("Label above"), &window);
     auto *aboveForm = new QVBoxLayout(aboveGroup);

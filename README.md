@@ -31,8 +31,9 @@ ready for Designer.
 `UxWidgets` packages the "label + field + icon" pattern repeated throughout desktop
 application forms. Instead of creating, aligning, and validating three widgets for
 each value, place **one** control that already knows how to behave as text, a number,
-or a date. It also includes a non-editable label and a label + combo box composite
-for values that are shown or selected rather than typed.
+or a date. It also includes a non-editable label, a label + combo box composite
+for values that are shown or selected rather than typed, and a check box with
+theme-aware focus highlighting and a read-only mode.
 
 ## ✨ Features
 
@@ -44,6 +45,9 @@ for values that are shown or selected rather than typed.
   same left/above placement.
 - 🔒 **Non-editable label** -- `UxLabel` shows read-only text with alignment,
   optional image, hover highlight, and fill-with-dots.
+- ☑️ **Check box** -- `UxCheck` highlights its background while focused (theme-aware),
+  shows a distinct text color while checked, and offers a `readOnly` mode that
+  ignores user toggles while keeping its normal look.
 - 📅 **Empty-tolerant date** -- built on `QLineEdit`, it accepts an empty field when
   not required (something `QDateEdit` does not naturally allow) and provides a popup
   calendar.
@@ -89,9 +93,10 @@ Two-layer architecture: controls inherit from standard Qt widgets.
   forwarding. The `Ux{Text,Number,Date}Input` convenience classes create the
   appropriate field type.
 
-Outside the typed-field layer, the library also ships two standalone controls:
-`UxLabel : QLabel` (non-editable label) and `UxComboInput : QWidget` (label +
-`QComboBox`).
+Outside the typed-field layer, the library also ships three standalone controls:
+`UxLabel : QLabel` (non-editable label), `UxComboInput : QWidget` (label +
+`QComboBox`), and `UxCheck : QCheckBox` (check box with focus highlighting,
+distinct checked text, and a read-only mode).
 
 ## 📋 Requirements
 
@@ -124,6 +129,7 @@ target_link_libraries(MyApp PRIVATE UxWidgets::UxWidgets)
 #include <UxWidgets/UxNumberInput.h>
 #include <UxWidgets/UxDateInput.h>
 #include <UxWidgets/UxComboInput.h>
+#include <UxWidgets/UxCheck.h>
 #include <UxWidgets/UxLabel.h>
 ```
 
@@ -165,6 +171,12 @@ code->setTextInteractionFlags(Qt::TextSelectableByMouse);
 auto *details = new UxLabel("Show details");
 details->setHighlight(true);
 connect(details, &UxLabel::clicked, this, [] { /* open the details view */ });
+
+// Check box with a read-only, pre-verified flag
+auto *notify = new UxCheck("Notify by phone");
+auto *verified = new UxCheck("Verified");
+verified->setChecked(true);
+verified->setReadOnly(true);
 ```
 
 ## 🧭 Control Catalog
@@ -178,6 +190,7 @@ connect(details, &UxLabel::clicked, this, [] { /* open the details view */ });
 | `UxTextInput` · `UxNumberInput` · `UxDateInput` | `UxInput` | Convenience classes that create the corresponding field type. |
 | `UxComboInput` | `QWidget` | Composite label + `QComboBox`. `labelText`, `labelPosition`; the combo is exposed via `comboBox()`. |
 | `UxLabel` | `QLabel` | Non-editable label. `multiline`, `highlight`, `highlightColor`, `fillWithDots`, `image`; emits `clicked()`. |
+| `UxCheck` | `QCheckBox` | Check box. Focus background tint (theme-aware), distinct text color while checked, `readOnly` mode that keeps the normal look. |
 
 <details>
 <summary><b>Properties (<code>Q_PROPERTY</code>)</b></summary>
@@ -193,6 +206,7 @@ so that a future Qt Designer plugin can expose them.
 | `UxInput` | `labelText`, `labelPosition` (`Left` \| `Above`), `text`, `maxLength`, `required` |
 | `UxComboInput` | `labelText`, `labelPosition` (`Left` \| `Above`) |
 | `UxLabel` | `multiline`, `highlight`, `highlightColor`, `fillWithDots`, `image` |
+| `UxCheck` | `readOnly` |
 
 </details>
 
@@ -247,7 +261,7 @@ can launch by double-clicking without Qt in `PATH`.
 
 - [ ] **Qt Designer** plugin that exposes controls and their properties in the palette.
 - [ ] **Theme-aware** required-field warning (currently uses a fixed light color).
-- [ ] New controls following the same pattern (check box, radio button, grid, etc.).
+- [ ] New controls following the same pattern (radio button, grid, etc.).
 - [ ] Installable package (`find_package(UxWidgets)`) in addition to `add_subdirectory`.
 
 ## 📄 License
